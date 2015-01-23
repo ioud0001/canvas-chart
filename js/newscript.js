@@ -208,11 +208,11 @@ function blotches(data){
     blotchContext.fillStyle = colour;	
 
     if (data.segments[i].value == smallest)
-		blotchContext.lineWidth = 0;
+		blotchContext.lineWidth = 1;
 	else if (data.segments[i].value == largest)
 		blotchContext.lineWidth = 8;
 	else
-		blotchContext.lineWidth = 3;
+		blotchContext.lineWidth = 3.5;
 	blotchContext.arc(currentPoint, blotchPointY - radius, radius, 0, Math.PI * 2, false);	
     blotchContext.closePath();
     blotchContext.fill();	//fill comes before stroke
