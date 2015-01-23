@@ -38,8 +38,28 @@ function ajax(){
 }
 function loadJS(jsonData){
 	data=jsonData;
-	for(var i=0; i<data.segments.length; i++){
-  		newValue = new newValue(i);  
+for(var i=0; i<data.segments.length; i++){
+  		newValue = data.segments[i].value; 
+  		// compare old and new values and declare smallest and largest
+  		// the first value is both small and large; it is the starting value in JSON file 
+  		if (largest == 0 && smallest == 0)
+			smallest = largest = newValue;
+  		if (newValue > largest)
+  			largest = newValue; 
+		// go through the following conditions 
+		// if the new value is less than the largest number
+		if (newValue < largest){
+			// set the value if none exists
+				if (smallest == 0)
+					smallest = newValue; 
+				// if the new value is less than the current smallest number, set it 
+				if (newValue < smallest)
+					smallest = newValue;
+		}
+	
+	// the new value is sent to old value
+	// now both values can be compared at the beginning of the loop
+	oldValue = newValue;   
 
   total += data.segments[i].value; // add the total 
 }
@@ -136,15 +156,13 @@ function blotches(data){
   var padding = Math.round(blotchCanvas.width / 2 / numPoints);	//calculate the distance dots on the grid
   // the grid line is equal to the canvas height, divided by two 
   var canvasY = blotchCanvas.height / 2;	
-  var currentPoint = 0;
-  //this will become the center of each cirlce.
-  //var y = canvasY; //center y point for circle
-  var colour;
+  var currentPoint = 0;//this will become the center of each cirlce.
+  
+  var colour; 
   
   // create a line in the middle of the grid for readability 
   // x is 0 and y is canvas.height / 2 
   blotchContext.font = "normal 16pt Arial";
-    blotchContext.fillStyle = "black";	//colour inside the circle
   blotchContext.beginPath();
   blotchContext.fillText("Cheese Sales:", 0, 50);
   
@@ -154,11 +172,7 @@ function blotches(data){
   blotchContext.closePath();
   blotchContext.font = "normal 12pt Arial";
   blotchContext.beginPath();
-  //blotchContext.fillText("Last updated on International Cheese Day: Jan 21, 2015", currentPoint, 260, 400);
-  blotchContext.fillStyle = "black";	//colour inside the circle
-  blotchContext.strokeStyle = 'red';
-        blotchContext.lineWidth = 2;
-
+        blotchContext.lineWidth = 1;
         // Fill the path
   blotchContext.closePath();
   
@@ -174,11 +188,14 @@ function blotches(data){
 	// the blotch point is equal to half the height of canvas and the pct value
 	// we want the blotch point higher than the 200 line
 	var blotchPointY = blotchCanvas.height / 2 - pct; 
-	
+	 colour = data.segments[i].color;
 	// create a safe distance between each current point
     currentPoint += pct + padding;
 
+	
 	alpha = pct * 0.05;
+	
+	
 	if (alpha <= smallest * 0.05)
 		alpha = 0.4;
 	console.log(alpha);
@@ -187,17 +204,15 @@ function blotches(data){
 
 	blotchContext.beginPath();
 	blotchContext.globalAlpha = alpha;
-
+	
     blotchContext.fillStyle = colour;	
-    //colour inside the circle set AFTER beginPath() BEFORE fill()
-    blotchContext.strokeStyle = "#333";	//colour of the lines 
-	console.log("large value is " + largest);
+
     if (data.segments[i].value == smallest)
-		blotchContext.lineWidth = 1;
-	else if (data.segments[i].value == "largest")
+		blotchContext.lineWidth = 0;
+	else if (data.segments[i].value == largest)
 		blotchContext.lineWidth = 8;
 	else
-		blotchContext.lineWidth = 4;
+		blotchContext.lineWidth = 3;
 	blotchContext.arc(currentPoint, blotchPointY - radius, radius, 0, Math.PI * 2, false);	
     blotchContext.closePath();
     blotchContext.fill();	//fill comes before stroke
@@ -207,11 +222,10 @@ function blotches(data){
     var lbl = pct.toString(); // percentage
     blotchContext.font = "normal 10pt Arial";
     blotchContext.textAlign = "center";
-    blotchContext.fillStyle = "black";	//colour inside the circle
+    blotchContext.fillStyle = "black";	//label colours
     blotchContext.beginPath();
 	
-	// calculate how many pixels left from blotch to 200 
-	
+	// labels
 	if (i % 2 == 0)
 		 labelY = blotchCanvas.height / 2 + 40;
 	else 
@@ -223,29 +237,5 @@ function blotches(data){
     blotchContext.closePath();  
   }
   
-}
-
-function newValue(number){
-	  		// compare old and new values and declare smallest and largest
-  		// the first value is both small and large; it is the starting value in JSON file 
-  		if (largest == 0 && smallest == 0)
-			smallest = largest = number;
-  		if (newValue > largest)
-  			largest = newValue; 
-		// go through the following conditions 
-		// if the new value is less than the largest number
-		if (newValue < largest){
-			// set the value if none exists
-				if (smallest == 0)
-					smallest = newValue; 
-				// if the new value is less than the current smallest number, set it 
-				if (newValue < smallest)
-					smallest = newValue;
-		}
-	
-	// the new value is sent to old value
-	// now both values can be compared at the beginning of the loop
-	oldValue = newValue;   
-	return number
 }
 
