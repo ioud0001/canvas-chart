@@ -219,7 +219,7 @@ function blotches(data){
     blotchContext.stroke();
     
 	var label = data.segments[i].label; // cheese type 
-    var lbl = pct.toString(); // percentage
+    var lbl = pct.toString() + " %"; // percentage
     blotchContext.font = "normal 10pt Arial";
     blotchContext.textAlign = "center";
     blotchContext.fillStyle = "black";	//label colours
