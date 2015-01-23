@@ -39,27 +39,8 @@ function ajax(){
 function loadJS(jsonData){
 	data=jsonData;
 	for(var i=0; i<data.segments.length; i++){
-  		newValue = data.segments[i].value; 
-  		// compare old and new values and declare smallest and largest
-  		// the first value is both small and large; it is the starting value in JSON file 
-  		if (largest == 0 && smallest == 0)
-			smallest = largest = newValue;
-  		if (newValue > largest)
-  			largest = newValue; 
-		// go through the following conditions 
-		// if the new value is less than the largest number
-		if (newValue < largest){
-			// set the value if none exists
-				if (smallest == 0)
-					smallest = newValue; 
-				// if the new value is less than the current smallest number, set it 
-				if (newValue < smallest)
-					smallest = newValue;
-		}
-	
-	// the new value is sent to old value
-	// now both values can be compared at the beginning of the loop
-	oldValue = newValue;   
+  		newValue = new newValue(i);  
+
   total += data.segments[i].value; // add the total 
 }
 	showPie(data);
@@ -93,7 +74,6 @@ function showPie(data){
     var pct = data.segments[i].value/total;
 
     var colour = data.segments[i].color;
-    //console.log(colour);
     var endAngle = currentAngle + (pct * (Math.PI * 2));
     //draw the arc
     pcContext.moveTo(cx, cy);
@@ -129,7 +109,6 @@ function showPie(data){
     var dy = Math.sin(midAngle) * (radius + 30);
     pcContext.lineTo(dx, dy);
 	var eachvalue = data.segments[i].value;
-	console.log(total); 
 	pct = (parseInt(eachvalue / total * 10000))/100;
 	//add the labels 
 	var label = data.segments[i].label.toString() + " (" + Math.round(pct) + "%)";
@@ -155,7 +134,6 @@ function blotches(data){
   //setDefaultStyles();
   var numPoints = data.segments.length;	//number of circles to draw.
   var padding = Math.round(blotchCanvas.width / 2 / numPoints);	//calculate the distance dots on the grid
-  console.log("the padding is:" + padding);
   // the grid line is equal to the canvas height, divided by two 
   var canvasY = blotchCanvas.height / 2;	
   var currentPoint = 0;
@@ -176,9 +154,16 @@ function blotches(data){
   blotchContext.closePath();
   blotchContext.font = "normal 12pt Arial";
   blotchContext.beginPath();
-  blotchContext.fillText("Last updated on International Cheese Day: Jan 21, 2015", currentPoint, 260, 400);
+  //blotchContext.fillText("Last updated on International Cheese Day: Jan 21, 2015", currentPoint, 260, 400);
   blotchContext.fillStyle = "black";	//colour inside the circle
+  blotchContext.strokeStyle = 'red';
+        blotchContext.lineWidth = 2;
+
+        // Fill the path
   blotchContext.closePath();
+  
+  var labelY; // used for the label
+  var alpha; // used for the opacity 
   for(var i=0; i<data.segments.length; i++){
     //the percentages will be used to create the area of the circles
     var pct = Math.round((data.segments[i].value / total) * 100);
@@ -187,34 +172,32 @@ function blotches(data){
     //center x point for circle
     //draw the circle
 	// the blotch point is equal to half the height of canvas and the pct value
-	var blotchPointY = blotchCanvas.height / 2 - pct; // we want the blotch point higher than the 200 line
+	// we want the blotch point higher than the 200 line
+	var blotchPointY = blotchCanvas.height / 2 - pct; 
+	
+	// create a safe distance between each current point
     currentPoint += pct + padding;
 
-    var red = Math.floor(Math.random() * 255); 
-    var green = Math.floor(Math.random() * 255); 
-    var blue = Math.floor(Math.random() * Math.floor(255 / pct));
-	
-	// the labels will be difficult to read if they blend in with the circle colors 
-	if (blue <= 100 && red <= 100 && green <= 100)
-		blue = red = green = Math.floor(Math.random * 255);
-	if (blue == "NaN" &&  red == "NaN" && green == "NaN")
-		blue = red = green = Math.floor(Math.random * 255);
-	
-	var alpha = pct * 0.5;
-	console.log(alpha + " is alpha");
-    //if(red.length==1)red= "0" + red;
-    //if(green.length==1)green= "0" + green;
-    //if(blue.length==1)blue="0"+blue;
-	
-    //colour = "#" + red + green + blue;
-	colour = "rgba(" + red + ","  + green + "," + blue + "," + alpha + ")"; 
-	console.log("the color is : " + colour); 
+	alpha = pct * 0.05;
+	if (alpha <= smallest * 0.05)
+		alpha = 0.4;
+	console.log(alpha);
+	console.log(smallest);
+	colour =  data.segments[i].color;
+
 	blotchContext.beginPath();
+	blotchContext.globalAlpha = alpha;
+
     blotchContext.fillStyle = colour;	
     //colour inside the circle set AFTER beginPath() BEFORE fill()
     blotchContext.strokeStyle = "#333";	//colour of the lines 
-    blotchContext.lineWidth = 1;
-
+	console.log("large value is " + largest);
+    if (data.segments[i].value == smallest)
+		blotchContext.lineWidth = 1;
+	else if (data.segments[i].value == "largest")
+		blotchContext.lineWidth = 8;
+	else
+		blotchContext.lineWidth = 4;
 	blotchContext.arc(currentPoint, blotchPointY - radius, radius, 0, Math.PI * 2, false);	
     blotchContext.closePath();
     blotchContext.fill();	//fill comes before stroke
@@ -226,12 +209,43 @@ function blotches(data){
     blotchContext.textAlign = "center";
     blotchContext.fillStyle = "black";	//colour inside the circle
     blotchContext.beginPath();
-
-	blotchContext.fillText(label, currentPoint, blotchPointY - radius, 80);
-	blotchContext.fillText(lbl, currentPoint, blotchPointY - radius / 2, radius);
+	
+	// calculate how many pixels left from blotch to 200 
+	
+	if (i % 2 == 0)
+		 labelY = blotchCanvas.height / 2 + 40;
+	else 
+		labelY = blotchCanvas.height / 2 - Math.ceil((radius + pct *3));  
+	// display each label after 200 px 
+	blotchContext.fillText(label, currentPoint, labelY);
+	blotchContext.fillText(lbl, currentPoint, labelY + 15);
 	
     blotchContext.closePath();  
   }
   
+}
+
+function newValue(number){
+	  		// compare old and new values and declare smallest and largest
+  		// the first value is both small and large; it is the starting value in JSON file 
+  		if (largest == 0 && smallest == 0)
+			smallest = largest = number;
+  		if (newValue > largest)
+  			largest = newValue; 
+		// go through the following conditions 
+		// if the new value is less than the largest number
+		if (newValue < largest){
+			// set the value if none exists
+				if (smallest == 0)
+					smallest = newValue; 
+				// if the new value is less than the current smallest number, set it 
+				if (newValue < smallest)
+					smallest = newValue;
+		}
+	
+	// the new value is sent to old value
+	// now both values can be compared at the beginning of the loop
+	oldValue = newValue;   
+	return number
 }
 
