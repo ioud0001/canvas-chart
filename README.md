@@ -9,10 +9,10 @@ You can view the live preview [here](http://ioud0001.github.io/canvas-chart/)
 * We create a variable that will store the JSON data
 * We create a variable that will store the total percents, which we want calculated and displayed on the canvas
 * We create a variable for the pie chart canvas, and for the canvas context and repeat for the other graph 
-* For the purposes of the assignment we need to know which value is the largest and which value is the smallest, so we created 
-an oldValue and newValue also, to compare them against each other and determine which is larger.
+* For the purposes of the assignment we need to know which value is the largest and which value is the smallest, so we created an oldValue and newValue also, to compare them against each other and determine which is larger.
 * We need to reference these elements in various parts of the application so I decided it is better to create these globally instead of duplicating.  
-#### Loading webpage content: 
+
+####Loading webpage content: 
 * In the **DOMContentLoaded** we are creating the script element and setting it to the latest JavaScript minified version
 * We are selecting both canvas elements according to their id's 
 * We are setting the context for each canvas element
