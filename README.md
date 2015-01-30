@@ -3,7 +3,7 @@
 ## Author: Anna Ioudovskaya 
 ###Description:  
 This project was created to demonstrate the use of the CANVAS tag in HTML5.  
-You can view the live previous [here](http://ioud0001.github.io/canvas-chart/) 
+You can view the live preview [here](http://ioud0001.github.io/canvas-chart/) 
 ### Instructions: 
 ####Global variables: 
 * We create a variable that will store the JSON data
