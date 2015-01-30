@@ -1,4 +1,3 @@
-# canvas-chart
 # Semester 2: Assignment 2: Pie Charts and Infographics
 ## Author: Anna Ioudovskaya 
 ###Description:  
